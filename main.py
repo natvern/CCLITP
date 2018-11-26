@@ -107,7 +107,7 @@ class Formula:
         if len(self.goal[num][0]) > 2:
             # If there is a disjunction on the left side, we get two new goals
             if self.goal[num][0][2] == "or":
-                newGoal = self.proof.disjunction(self.goal[num][0][:2],self.goal[num][1][:2])
+                newGoal = self.proof.disjunction(self.goal[num][0][:2],self.goal[num][1])
                 del self.goal[num]
                 self.goal += newGoal
 
@@ -140,7 +140,7 @@ A = Clause("A")
 B = Clause("B")
 
 
-firstFormula = ([],[A,B,"imply"])
+firstFormula = ([],[A,A,"imply"])
 statement = Formula(firstFormula)
 
 while statement.goal != []:
