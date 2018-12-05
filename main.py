@@ -10,6 +10,7 @@
 #    20/11 12:54          20/11 13:10
 #    20/11 16:23          20/11 18:20
 #    24/11 14:57          24/11 17:36
+#    05/12 15:23          05/12
 
 # Clauses are building tiles for formula
 # They are objects which can either be True or False
@@ -39,6 +40,7 @@ class Rules:
     def __init__(self):
         self.axiom = [self.equality]
         self.rules = [self.disjunction]
+        self.mainGoal = []
 
     # The only axiom is when we have two atomic clauses on both sides
     def equality(self, A, B):
@@ -49,25 +51,31 @@ class Rules:
 
     # When facing a disjunction, we separate the formula into two new formula
     # That we define as new goals
-    def disjunction(self, A, B):
+    def disjunction(self, A, B, goal):
+        self.mainGoal = goal
         newGoals = []
-        for i in range(2):
-            newGoal = ([A[i]], B)
+        for i in [A,B]:
+            newGoal = (self.mainGoal[0]+[i], self.mainGoal[1])
             newGoals.append(newGoal)
         return newGoals
 
     # A conjunction would create two new goals
-    def conjunction(self, A, B):
+    def conjunction(self, A, B, goal):
+        self.mainGoal = goal
         newGoals = []
-        for i in range(2):
-            newGoal = (A,[B[i]])
+        for i in [A,B]:
+            newGoal = (self.mainGoal[0],self.mainGoal[1]+[i])
             newGoals.append(newGoal)
         return newGoals
 
-    # If it is an implication, we can think of the A implies B as A a hypothesis
-    # And B a conclusion, basically shifting the initial conclusion
-    def implication(self, A, B):
-        return [([A],[B])]
+    # If it is an implication (A -> B), we get two new goals
+    # One for which A is part of the conclusion,
+    # The other is when B is part of the hypothesis
+    def implication(self, A, B, goal):
+        self.mainGoal = goal
+        newGoal_1 = (self.mainGoal[0], self.mainGoal[1] + [A])
+        newGoal_2 = (self.mainGoal[0] + [B], self.mainGoal[1])
+        return [newGoal_1, newGoal_2]
 
 
 # Input the formula (Theorem to prove)
@@ -77,78 +85,124 @@ class Rules:
 
 class Formula:
     def __init__(self, goals):
-        self.goal = [goals]
+        self.goals = [goals]
         self.proof = Rules()
+        self.goal = []
+        self.mainGoal = []
 
     # Prints the current state of the goals
     def showGoal(self):
-        i = 0
-        for form in self.goal:
-            print(i, ": ", str(form[0]) + "|--" + str(form[1]))
-            i =+ 1
+        for i in range(len(self.goals)):
+            print(i, ": ", str(self.goals[i][0]) + "|--" + str(self.goals[i][1]))
 
+    # Define which part of the goal we are applying the rule to
+    def defineGoal(self,num):
+        numGoal = -1
+        side = -1
+        while side not in [0,1]:
+            side = int(input("Enter 0 for left, 1 for right side: "))
+        while numGoal not in range(len(self.goals[num][side])):
+            numGoal = int(input("Enter a correct goal to apply the rule to: "))
+        return numGoal, side
+
+    # Checks if the statement is only composed of atomic clauses
+    def atomic(self):
+        hypothesis = self.mainGoal[0]
+        conclusion = self.mainGoal[1]
+        for statement in hypothesis:
+            if len(statement) > 1:
+                return False
+        for statement in conclusion:
+            if len(statement) > 1:
+                return False
+        return True
 
     # Apply the rules on the specific goal the user chooses
-    def applyRules(self, numGoal):
+    def applyRules(self, num):
+        self.mainGoal = self.goals[num]
+
         # Our base case is when goal is empty (no more to prove)
-        if self.goal == []:
+        if self.goals == []:
             print("Reached an axiom. Exit.")
             return True
 
-        # If there is an "and" on the left side, we delete it
-        if len(self.goal[num][0]) > 2 and self.goal[num][0][2] == "and":
-            del self.goal[num][0][2]
+        if not self.atomic():
+            numGoal, side = self.defineGoal(num)
+            self.goal = self.mainGoal[side][numGoal]
+        else:
+            side = -1
 
-        # If there is an "or" on the right side, we delete it
-        if len(self.goal[num][1]) > 2 and self.goal[num][1][2] == "or":
-            del self.goal[num][1][2]
+        # If the user selects a statement from the conclusion
+        if side == 1 and len(self.goal) > 2:
+            # If there is an "or" on the right side, we delete it
+            if self.goal[2] == "or":
+                del self.goal[2]
+                return 0
+            # If there is an "and" on the right side, we create two new goals
+            elif self.goal[2] == "and":
+                A = self.goal[0]
+                B = self.goal[1]
+                del self.mainGoal[side][numGoal]
+                newGoal = self.proof.conjunction(A, B, self.mainGoal)
+                del self.goals[num]
+                self.goals += newGoal
+                return 0
+            # if there is an "imply" on the right side, we add A to the hypothesis
+            elif self.goal[2] == "imply":
+                A = self.goal[0]
+                B = self.goal[1]
+                del self.mainGoal[side][numGoal]
+                self.mainGoal[0].append(A)
+                self.mainGoal[1].append(B)
+                return 0
 
-        # Check if there is a logical operator on the left side:
-        if len(self.goal[num][0]) > 2:
-            # If there is a disjunction on the left side, we get two new goals
-            if self.goal[num][0][2] == "or":
-                newGoal = self.proof.disjunction(self.goal[num][0][:2],self.goal[num][1])
-                del self.goal[num]
-                self.goal += newGoal
 
-        # Check if there is a logical operator on the right side:
-        elif len(self.goal[num][1]) > 2:
-            # If it is an implication
-            if self.goal[num][1][2] == "imply":
-                newGoal = self.proof.implication(self.goal[num][1][0],self.goal[num][1][1])
-                del self.goal[num]
-                self.goal += newGoal
-
-            elif self.goal[num][1][2] == "and":
-                newGoal = self.proof.conjunction(self.goal[num][0][:2],self.goal[num][1][:2])
-                del self.goal[num]
-                self.goal += newGoal
-
+        # If the user selects a statement from the hypothesis
+        elif side == 0 and len(self.goal) > 2:
+            # If there is an "and" on the right side, we delete it
+            if self.goal[2] == "and":
+                del self.goal[2]
+                return 0
+            # If there is an "or" on the right side, we create two new goals
+            elif self.goal[2] == "or":
+                A = self.goal[0]
+                B = self.goal[1]
+                del self.mainGoal[side][numGoal]
+                newGoal = self.proof.disjunction(A, B, self.mainGoal)
+                del self.goals[num]
+                self.goals += newGoal
+                return 0
+            # If it is an implication, we create two new goals
+            elif self.goal[2] == "imply":
+                A = self.goal[0]
+                B = self.goal[1]
+                del self.mainGoal[side][numGoal]
+                newGoal = self.proof.implication(A,B,self.mainGoal)
+                del self.goals[num]
+                self.goals += newGoal
+                return 0
 
         # If there is no logical operator, it might be an axiom
-        elif self.proof.equality(self.goal[num][0], self.goal[num][1]):
-            del self.goal[num]
-
-        # If nothing is applied
-        else:
-            print("Found no inference rule to apply. Cannot prove any further. Check your initial statement.")
+        if self.proof.equality(self.mainGoal[0], self.mainGoal[1]):
+            del self.goals[num]
 
 
 
 # Testing input
-A = Clause("A")
-B = Clause("B")
+A = Clause("Human")
+B = Clause("Socrates")
+C = Clause("Death")
 
 
-firstFormula = ([],[A,A,"imply"])
+firstFormula = ([[[A],[C],"imply"],[[B],[A],"imply"]],[[[B],[C],"imply"]])
 statement = Formula(firstFormula)
 
-while statement.goal != []:
+while statement.goals != []:
     # We ask for which formula we want to apply the rule to first
     statement.showGoal()
     num = -1
-    while num not in range(0,len(statement.goal)):
-        num = int(input("Enter a correct goal to apply the rule to: "))
+    while num not in range(0,len(statement.goals)):
+        num = int(input("Enter the number of the goal: "))
     statement.applyRules(num)
 
 print("Reached an axiom. Proof is over.")
