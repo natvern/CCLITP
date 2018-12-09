@@ -13,7 +13,7 @@
 #    05/12 15:23          05/12 23:10
 #    07/12 15:32          07/12 16:32
 #    08/12 15:39          08/12 21:22
-#    08/12 23:10          09/12 
+#    08/12 23:10          09/12 04:10
 
 from engine import *
 from GUI import *
@@ -21,9 +21,9 @@ import tkinter
 
 # Testing input
 
-A = Clause("Human")
-B = Clause("Black Hair")
-C = Clause("Person")
+A = Clause("Death")
+B = Clause("CMU student")
+C = Clause("CMU")
 
 firstFormula = ( [ [ [B], [C], "imply"],   [ [C] , [A] , "imply"] ]  , [ [ [B] , [A] , "imply" ]  ]  )
 statement = Formula(firstFormula)
