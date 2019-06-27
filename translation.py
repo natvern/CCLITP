@@ -32,7 +32,7 @@ def is_precstack(S):
         S = S[1:]
         y = tmp[0]
         tmp = tmp[1:]
-        if (prec(x) >= prec(y)):
+        if (prec(x) <= prec(y)):
             prestack = False
         tmp = [y] + tmp
         tmp = [x] + tmp
@@ -46,7 +46,9 @@ def syntax(form):
     output = []
     output_final = []
     prestack = []
+    prestack_tmp = []
     current = 0
+    counter = 0
     clause_phase = True
     while (form != []):
         if form[0] == "(":
@@ -91,20 +93,21 @@ def syntax(form):
                     output.append(x)
                     clause_phase = False
                     if (form[0] == ")"):
-                        while (prestack != []):
-                            output.append(prestack[0])
-                            prestack = prestack[1:]
+                        while (prestack_tmp != []):
+                            counter -= 1
+                            output.append(prestack_tmp[0])
+                            prestack_tmp = prestack_tmp[1:]
                 else:
                     x = form[0]
                     form = form[1:]
-                    prestack = [x] + prestack
-                    if (not is_precstack(prestack)):
-                        x = prestack[0]
-                        prestack = prestack[1:]
-                        while (prestack != []):
-                            output.append(prestack[0])
-                            prestack = prestack[1:]
-                        prestack = [x] + prestack
+                    prestack_tmp = [x] + prestack_tmp
+                    if (not is_precstack(prestack_tmp)):
+                        x = prestack_tmp[0]
+                        prestack_tmp = prestack_tmp[1:]
+                        while (prestack_tmp != []):
+                            output.append(prestack_tmp[0])
+                            prestack_tmp = prestack_tmp[1:]
+                        prestack_tmp = [x] + prestack_tmp
                     clause_phase = True
     output_final = output_final + output
     while (prestack != []):
@@ -126,7 +129,11 @@ def parse_f(form, i = 0):
 
 def translate(form):
     form_l = form.split(" ")
-    return parse_f(syntax(form_l))
+    return parse_f(syntax(form_l))[0]
 
 ## TESTING 
 print(translate("( ( A imply B ) and B ) imply C"))
+print(translate("( ( A and B ) imply C )"))
+print(translate("A and ( B or C ) imply D"))
+print(translate("A and ( ( B or C ) imply D )"))
+print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))
