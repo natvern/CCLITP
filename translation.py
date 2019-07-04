@@ -132,8 +132,9 @@ def translate(form):
     return parse_f(syntax(form_l))[0]
 
 ## TESTING 
-print(translate("( ( A imply B ) and B ) imply C"))
-print(translate("( ( A and B ) imply C )"))
-print(translate("A and ( B or C ) imply D"))
-print(translate("A and ( ( B or C ) imply D )"))
-print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))
+def testing():
+    print(translate("( ( A imply B ) and B ) imply C"))
+    print(translate("( ( A and B ) imply C )"))
+    print(translate("A and ( B or C ) imply D"))
+    print(translate("A and ( ( B or C ) imply D )"))
+    print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))

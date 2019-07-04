@@ -20,6 +20,9 @@
 #    25/06/2019 21:12
 #    26/06/2019 14:50
 #    27/06/2019 17:29
+#    01/07/2019 12:57
+#    03/07/2019 17:04
+#    04/07/2019 18:23
 
 from engine import *
 from GUI import *
@@ -28,11 +31,13 @@ import tkinter
 
 # Testing input
 
-A = Clause("Death")
-B = Clause("CMU student")
-C = Clause("CMU")
+F = Prop("Falsehood")
+F.changeState()
+A = Prop("Death")
+B = Prop("CMU student")
+C = Prop("CMU")
 
-firstFormula = ( [ [ [B], [C], "imply"],   [ [C] , [A] , "imply"] ]  , [ [ [B] , [A] , "imply" ]  ]  )
+firstFormula = ( [ [A] ]  , [ [ [A] , [A], "or"  ] ] )
 statement = Formula(firstFormula)
 
 root = tkinter.Tk()
