@@ -41,7 +41,7 @@ C = Prop("CMU")
 green = Prop("Green")
 red = Prop("Red")
 
-firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
+#firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
 #firstFormula = ( [] ,[ [[A], [[A], "not"] ,"or"] ] )
 #firstFormula = ( [] ,  [ [[A] ,[[A] , "not"], "and"] ] )
 statement = Formula(firstFormula)

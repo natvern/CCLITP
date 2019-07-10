@@ -29,7 +29,7 @@ class Calculus:
     def found_falsehood(self, hypothesis):
         for i in hypothesis:
             if len(i) == 1:
-                if i[0].getState == False:
+                if i[0].getState() == False:
                     return True
         return False
 
@@ -39,8 +39,9 @@ class Calculus:
         self.mainGoal = goal[side][n]
         if side == 0:
             newGoals = []
+            del goal[side][n]
             for i in [self.mainGoal[0],self.mainGoal[1]]:
-                newGoal = (self.mainGoal[0]+[i], self.mainGoal[1])
+                newGoal = (goal[0]+[i], goal[1])
                 newGoals.append(newGoal)
             return newGoals
         elif side == 1:
@@ -50,31 +51,51 @@ class Calculus:
             del goal[side][n]
             goal[side].append(A)
             goal[side].append(B)
-            return goal
-        raise "Error choosing the side (not 0 or 1)"
+            return [goal]
+        raise "Disjunction: Error choosing the side (not 0 or 1)"
 
     # A conjunction would create two new goals
-    def conjunction(self, A, B, goal):
-        self.mainGoal = goal
-        newGoals = []
-        for i in [A,B]:
-            newGoal = (self.mainGoal[0],self.mainGoal[1]+[i])
-            newGoals.append(newGoal)
-        return newGoals
+    def conjunction(self, goal, side, n):
+        self.mainGoal = goal[side][n]
+        if side == 0:
+            A = self.mainGoal[0]
+            B = self.mainGoal[1]
+            del goal[side][n]
+            goal[side].append(A)
+            goal[side].append(B)
+            return [goal]
+        elif side == 1: 
+            newGoals = []
+            del goal[side][n]
+            for i in [self.mainGoal[0],self.mainGoal[1]]:
+                newGoal = (goal[0]+[i],goal[1])
+                newGoals.append(newGoal)
+            return newGoals
+        return "Conjunction: Error choosing the side (not 0 or 1)"
 
     # If it is an implication (A -> B), we get two new goals
     # One for which A is part of the conclusion,
     # The other is when B is part of the hypothesis
-    def implication(self, A, B, goal):
-        self.mainGoal = goal
-        newGoal_1 = (self.mainGoal[0], self.mainGoal[1] + [A])
-        newGoal_2 = (self.mainGoal[0] + [B], self.mainGoal[1])
-        return [newGoal_1, newGoal_2]
+    def implication(self, goal, side, n):
+        self.mainGoal = goal[side][n]
+        if side == 0:
+            del goal[side][n]
+            newGoal_1 = (goal[0], goal[1] + [self.mainGoal[0]])
+            newGoal_2 = (goal[0] + [self.mainGoal[1]], goal[1])
+            return [newGoal_1, newGoal_2]
+        elif side == 1:
+            A = self.mainGoal[0]
+            B = self.mainGoal[1]
+            del goal[side][n]
+            goal[0].append(A)
+            goal[1].append(B)
+            return [goal]
+        return "Implication: Error choosing the side (not 0 or 1)"
 
     # Negation is equivalent to A imply Falsehood
     def negation(self, goal, side, n):
         self.mainGoal = goal[side][n]
         A = self.mainGoal[0]
         goal[side][n] = [A, [self.Falsehood], "imply"]
-        return goal
+        return [goal]
 

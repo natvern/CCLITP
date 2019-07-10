@@ -55,7 +55,7 @@ class Formula:
         text = ""
         if len(goal) > 2:
                 text = text + str(goal[0]) + " " + str(goal[2]) + " " + str(goal[1])
-        if len(goal) == 2:
+        elif len(goal) == 2:
                 text = text + str(goal[1]) + " " + str(goal[0])
         else:
                 text = text + str(goal)
@@ -104,80 +104,20 @@ class Formula:
         elif logical_connective == "or":
             newGoal = self.proof.disjunction(self.mainGoal, side, numGoal)
             del self.goals[num] 
-            self.goals += [newGoal]
-            print(self.goals)
+            self.goals += newGoal
             return "Disjunction found"
 
-        #elif logical_connective == "and":
-        #    newGoal = self.proof.conjunction(self.mainGoal, side, numGoal)
+        elif logical_connective == "and":
+            newGoal = self.proof.conjunction(self.mainGoal, side, numGoal)
+            del self.goals[num]
+            self.goals += newGoal
+            return "Conjunction found"
 
-        #else:
-        #    return ""
-
-        # If the user selects a statement from the conclusion
-        if side == 1 and len(self.goal) > 2:
-            # If there is an "or" on the right side, we delete it
-            if self.goal[2] == "or":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                self.mainGoal[0].append(A)
-                self.mainGoal[0].append(B)
-                return "We applied the 'or' rule on the right side. Basically, an or in the conclusion does not matter." \
-                "Hence, we can delete it and take the statements as separates."
-            # If there is an "and" on the right side, we create two new goals
-            elif self.goal[2] == "and":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                newGoal = self.proof.conjunction(A, B, self.mainGoal)
-                del self.goals[num]
-                self.goals += newGoal
-                return "We applied the 'and' rule on the right side. In other words, we define two new goals. First," \
-                "if we have 'A and B', then we need to prove the conclusion for both A and B."
-            # if there is an "imply" on the right side, we add A to the hypothesis
-            elif self.goal[2] == "imply":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                self.mainGoal[0].append(A)
-                self.mainGoal[1].append(B)
-                return "We applied the 'imply' rule on the right side. If we have 'A imply B' then we consider A as" \
-                " part of the hypothesis and B the conclusion for everything."
-
-
-        # If the user selects a statement from the hypothesis
-        elif side == 0 and len(self.goal) > 2:
-            # If there is an "and" on the left side, we delete it and shift other statements
-            if self.goal[2] == "and":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                self.mainGoal[0].append(A)
-                self.mainGoal[0].append(B)
-                return "We applied the 'and' rule on the left side. Basically, an 'and' on the hypothesis does not" \
-                " matter. So we consider the statements as separates."
-            # If there is an "or" on the right side, we create two new goals
-            elif self.goal[2] == "or":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                newGoal = self.proof.disjunction(A, B, self.mainGoal)
-                del self.goals[num]
-                self.goals += newGoal
-                return "We applied the 'or' rule on the left side. We do so by considering two new goals. One for" \
-                " every part of the 'or' statement as part of the hypothesis."
-            # If it is an implication, we create two new goals
-            elif self.goal[2] == "imply":
-                A = self.goal[0]
-                B = self.goal[1]
-                del self.mainGoal[side][numGoal]
-                newGoal = self.proof.implication(A,B,self.mainGoal)
-                del self.goals[num]
-                self.goals += newGoal
-                return "We applied the 'imply' rule on the left side. We consider two new goals. Example: A->B" \
-                " Then we get two new goals, one for which A is part of the conclusion and the other where B is" \
-                " in the hypothesis."
+        elif logical_connective == "imply":
+            newGoal = self.proof.implication(self.mainGoal, side, numGoal)
+            del self.goals[num]
+            self.goals += newGoal
+            return "Implication found"
 
         # If there is no logical operator, it might be an axiom
         if self.proof.identity(self.mainGoal[0], self.mainGoal[1]):
@@ -185,5 +125,9 @@ class Formula:
             return "An axiom was found. The only axiom in sequent calculus is when the same atomic clauses are" \
             " present in both sides. An atomic clause is something that is not defined by a logical operator." \
             " for instance, '15-112' is an atomic clause, '15-112 is the best' is a compound statement."
+
+        elif self.proof.found_falsehood(self.mainGoal[0]):
+            del self.goals[num]
+            return "Falsehood in the hypothesis found"
 
         return "You just clicked on something that did not do much. Try playing with another button."

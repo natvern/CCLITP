@@ -111,6 +111,7 @@ class Proof:
         self.frames.append(tkinter.Frame(self.frame, bg="#062356"))
         j = len(self.frames)
         i = len(self.options)
+        print(self.formula.goals)
         for goal in range(len(self.formula.goals)):
             for statement in range(2):
                 for clause in range(len(self.formula.goals[goal][statement])):
