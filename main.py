@@ -23,6 +23,9 @@
 #    01/07/2019 12:57
 #    03/07/2019 17:04
 #    04/07/2019 18:23
+#    07/07/2019 15:00
+#    10/07/2019 11:28
+#    10/07/2019 15:24
 
 from engine import *
 from GUI import *
@@ -32,12 +35,15 @@ import tkinter
 # Testing input
 
 F = Prop("Falsehood")
-F.changeState()
 A = Prop("Death")
 B = Prop("CMU student")
 C = Prop("CMU")
+green = Prop("Green")
+red = Prop("Red")
 
-firstFormula = ( [ [A] ]  , [ [ [A] , [A], "or"  ] ] )
+firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
+#firstFormula = ( [] ,[ [[A], [[A], "not"] ,"or"] ] )
+#firstFormula = ( [] ,  [ [[A] ,[[A] , "not"], "and"] ] )
 statement = Formula(firstFormula)
 
 root = tkinter.Tk()

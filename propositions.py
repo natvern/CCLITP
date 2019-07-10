@@ -11,7 +11,7 @@ class Prop:
         self.name = name
 
     # If dealing with NOT A, we will change the state
-    def changeState(self):
+    def getState(self):
         self.state = not self.state
 
     # To print the Clause as its name
@@ -25,7 +25,8 @@ class Prop:
 class FalseHood(Prop):
     def __init__(self):
         Prop.__init__(self, "False")
-
+        self.state = False
+        
 class TruthHood(Prop):
     def __init__(self):
         Prop.__init__(self, "True")

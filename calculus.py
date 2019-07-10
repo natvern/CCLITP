@@ -3,22 +3,34 @@
 ## Created  : 7/4/2019 - 19:42
 ## andrewID : srahmoun
 
+## NOTES FROM 7/10/2019
+## Rules are independant of the engine, hence changing the logic
+## would mean writing a new file for different inference rules
+
 from propositions import FalseHood
 
 # We will define the inference rules that would apply
 # They are directly derived from sequent calculus
 class Calculus:
     def __init__(self):
-        self.axiom = [self.identity]
+        self.axiom = [self.identity, self.found_falsehood]
         self.rules = [self.disjunction, self.conjunction, self.implication, self.negation]
         self.mainGoal = []
         self.Falsehood = FalseHood()
 
-    # The only axiom is when we have two atomic clauses on both sides
+    # One axiom is when we have the same atomic clauses on both sides
     def identity(self, A, B):
         for i in A:
             if i in B:
                 return True
+        return False
+
+    # Another axiom is when falsehood is found in the hypothesis
+    def found_falsehood(self, hypothesis):
+        for i in hypothesis:
+            if len(i) == 1:
+                if i[0].getState == False:
+                    return True
         return False
 
     # When facing a disjunction, we separate the formula into two new formula
