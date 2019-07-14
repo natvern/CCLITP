@@ -137,4 +137,5 @@ def testing():
     print(translate("( ( A and B ) imply C )"))
     print(translate("A and ( B or C ) imply D"))
     print(translate("A and ( ( B or C ) imply D )"))
-    print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))
+    print(translate("( Sideeg imply Idiot ) and ( Sideeg imply Ward )"))
+    #print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))

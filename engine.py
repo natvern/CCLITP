@@ -14,18 +14,21 @@
 
 from calculus import Calculus
 from propositions import *
+from translation import translate
 
 # Input the formula (Theorem to prove)
 # A formula is based on a hypothesis and a conclusion
 # We define them as an object
 
-
 class Formula:
-    def __init__(self, goals):
+    def __init__(self, goals, props):
         self.goals = [goals]
         self.proof = Calculus()
         self.goal = []
         self.mainGoal = []
+        self.propositions = props
+        self.str_propositions = toString(props)
+        self.inProgress = []
 
     # Shows the first statement that we are proving
     def showStatement(self):
@@ -79,6 +82,26 @@ class Formula:
     #           1 - choose a proposition from the conclusion
     # The num goal is the position of the proposition in the list 
     # representing the formula
+
+    def getCut(self, num):
+        goal = self.mainGoal
+        delta = self.inProgress[0]
+        delta_goal = goal[delta[1]][delta[2]]
+        gamma = self.inProgress[1]
+        gamma_goal = goal[gamma[1]][gamma[2]]
+        prop = self.inProgress[2]
+        if prop in self.str_propositions:
+            for real_prop in self.propositions:
+                if real_prop.getName() == prop:
+                    prop = [real_prop]
+                    print("Yes real prop")
+        else:
+            prop = Prop(prop)
+        del self.goals[num]
+        newGoal = self.proof.cut(goal, delta_goal, gamma_goal, prop)
+        #print(newGoal)
+        self.goals += newGoal
+        return "Applied cut"
 
     def applyRules(self, num, side, numGoal):
         # This is the chosen proposition 

@@ -99,3 +99,12 @@ class Calculus:
         goal[side][n] = [A, [self.Falsehood], "imply"]
         return [goal]
 
+    # Cut breaks the main goal into smaller goals that
+    # make it easier to prove
+    def cut(self, mainGoal, delta, gamma, prop):
+        self.mainGoal = mainGoal
+        C = self.mainGoal[1]
+        newGoal_1 = ([gamma],[prop])
+        newGoal_2 = ([prop, delta],C)
+        return [newGoal_1, newGoal_2]
+

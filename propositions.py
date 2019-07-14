@@ -16,6 +16,9 @@ class Prop:
     def getState(self):
         return self.state
 
+    def getName(self):
+        return self.name
+
     # To print the Clause as its name
     def __repr__(self):
         return self.name
@@ -36,4 +39,8 @@ class TruthHood(Prop):
     def __init__(self):
         Prop.__init__(self, "True")
 
-
+def toString(props):
+    string_prop = []
+    for prop in props:
+        string_prop.append(prop.getName())
+    return string_prop

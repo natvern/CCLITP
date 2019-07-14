@@ -95,7 +95,19 @@ class Proof:
         self.displayFormula()
         self.frame.pack()
 
-    def buttonClicked(self,goal, statement, clause):
+    def buttonClicked(self, goal, statement, clause):
+        maybe_cut = input()
+        if maybe_cut == "cut":
+            self.formula.inProgress.append([goal, statement, clause])
+            return 0
+        if maybe_cut == "prop":
+            self.formula.inProgress.append(input())
+            return 0
+        if maybe_cut == "do":
+            message = self.formula.getCut(goal)
+            messagebox.showinfo("Rule applied", message)
+            self.displayFormula()
+            return 0
         message = self.formula.applyRules(goal, statement, clause)
         messagebox.showinfo("Rule applied",message)
         if message == "You just clicked on something that did not do much. Try playing with another button.":

@@ -26,11 +26,15 @@
 #    07/07/2019 15:00
 #    10/07/2019 11:28
 #    10/07/2019 15:24
+#    11/07/2019 15:52
+#    13/07/2019 13:33
+#    14/07/2019 13:51
 
 from engine import *
 from GUI import *
 from translation import translate
 import tkinter
+from calculus import Calculus
 
 # Testing input
 
@@ -41,10 +45,15 @@ C = Prop("CMU")
 green = Prop("Green")
 red = Prop("Red")
 
-#firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
+Sideeg = Prop("Sideeg")
+Ward = Prop("Ward")
+Idiot = Prop("Idiot")
+
+firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
 #firstFormula = ( [] ,[ [[A], [[A], "not"] ,"or"] ] )
 #firstFormula = ( [] ,  [ [[A] ,[[A] , "not"], "and"] ] )
-statement = Formula(firstFormula)
+#firstFormula = ([[[[Sideeg],[Ward],"imply"], [[Sideeg], [Idiot], "imply"], "and" ]],     [[[Ward], [Idiot], "imply"]])
+statement = Formula(firstFormula, [green, red])
 
 root = tkinter.Tk()
 root.configure(background="#062356")
