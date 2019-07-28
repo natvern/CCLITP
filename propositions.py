@@ -10,6 +10,14 @@ class Prop:
         self.state = True
         self.name = name
 
+    # Equality of two propositions
+    # We consider the name to be an ID, hence unique
+    def __eq__(self, prop_1):
+        if prop_1 != []:
+            if self.getName() == prop_1.getName():
+                return True
+        return False
+
     # Get state of the proposition
     # Falsehood being False
     # Truthood being True
@@ -18,6 +26,9 @@ class Prop:
 
     def getName(self):
         return self.name
+
+    def isProp(self):
+        return True
 
     # To print the Clause as its name
     def __repr__(self):

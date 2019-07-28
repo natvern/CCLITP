@@ -112,7 +112,7 @@ class Proof:
         messagebox.showinfo("Rule applied",message)
         if message == "You just clicked on something that did not do much. Try playing with another button.":
             return 0
-        if self.formula.goals != []:
+        if self.formula.sequents != []:
             self.displayFormula()
         else:
             end = tkinter.Label(text = "Reached an axiom. Proof is done.")
@@ -123,11 +123,10 @@ class Proof:
         self.frames.append(tkinter.Frame(self.frame, bg="#062356"))
         j = len(self.frames)
         i = len(self.options)
-        print(self.formula.goals)
-        for goal in range(len(self.formula.goals)):
+        for goal in range(len(self.formula.sequents)):
             for statement in range(2):
-                for clause in range(len(self.formula.goals[goal][statement])):
-                    self.options.append(tkinter.Button(self.frames[j-1], text=self.formula.toString(self.formula.goals[goal][statement][clause]), highlightbackground="#062356", command=lambda x=goal, y=statement, z=clause: self.buttonClicked(x,y,z)))
+                for clause in range(len(self.formula.sequents[goal][statement])):
+                    self.options.append(tkinter.Button(self.frames[j-1], text=self.formula.toString(self.formula.sequents[goal][statement][clause]), highlightbackground="#062356", command=lambda x=goal, y=statement, z=clause: self.buttonClicked(x,y,z)))
                     if goal != 0 and statement == 0 and clause == 0:
                         newGoal = tkinter.Label(self.frames[j-1], bg="#062356", fg="#062356", text="//////")
                         newGoal.pack(side="left")

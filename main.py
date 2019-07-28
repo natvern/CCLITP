@@ -29,33 +29,40 @@
 #    11/07/2019 15:52
 #    13/07/2019 13:33
 #    14/07/2019 13:51
+#    21/07/2019 13:10
+#    22/07/2019 14:11
+#    24/07/2019 13:30
+#    25/07/2019 17:50
+#    28/07/2019 16:18
 
-from engine import *
+from engine_v2 import *
 from GUI import *
 from translation import translate
 import tkinter
 from calculus import Calculus
+from formula import *
+
+# Main function to run CCLITP
+def main(statement):
+    root = tkinter.Tk()
+    root.configure(background="#062356")
+    frame = Menu(root, statement)
+    root.mainloop()
 
 # Testing input
-
-F = Prop("Falsehood")
-A = Prop("Death")
-B = Prop("CMU student")
-C = Prop("CMU")
 green = Prop("Green")
 red = Prop("Red")
-
 Sideeg = Prop("Sideeg")
 Ward = Prop("Ward")
 Idiot = Prop("Idiot")
+Idiot_1 = Prop("Idiot")
 
-firstFormula = ( [ [ [ [green], [red], "or"]  ,[[green],"not"],"and"] ]  , [ [red] ] )
-#firstFormula = ( [] ,[ [[A], [[A], "not"] ,"or"] ] )
-#firstFormula = ( [] ,  [ [[A] ,[[A] , "not"], "and"] ] )
-#firstFormula = ([[[[Sideeg],[Ward],"imply"], [[Sideeg], [Idiot], "imply"], "and" ]],     [[[Ward], [Idiot], "imply"]])
-statement = Formula(firstFormula, [green, red])
 
-root = tkinter.Tk()
-root.configure(background="#062356")
-frame = Menu(root, statement)
-root.mainloop()
+hypothesis = translate("Red and Green")
+conclusion = translate("Red and Ward")
+firstFormula = ([hypothesis], [conclusion])
+statement = Theorem(firstFormula)
+
+# Running CCLITP
+#print(conclusion)
+main(statement)

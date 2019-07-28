@@ -8,6 +8,7 @@
 ## would mean writing a new file for different inference rules
 
 from propositions import FalseHood
+from formula import *
 
 # We will define the inference rules that would apply
 # They are directly derived from sequent calculus
@@ -15,8 +16,8 @@ class Calculus:
     def __init__(self):
         self.axiom = [self.identity, self.found_falsehood]
         self.rules = [self.disjunction, self.conjunction, self.implication, self.negation]
-        self.mainGoal = []
-        self.Falsehood = FalseHood()
+        #self.mainGoal = []
+        self.Falsehood = Formula(Conn.NONE, FalseHood())
 
     # One axiom is when we have the same atomic clauses on both sides
     def identity(self, A, B):
@@ -27,84 +28,87 @@ class Calculus:
 
     # Another axiom is when falsehood is found in the hypothesis
     def found_falsehood(self, hypothesis):
-        for i in hypothesis:
-            if len(i) == 1:
-                if i[0].getState() == False:
+        for f in hypothesis:
+            if f.getConn() == Conn.NONE and f.getAtom() != []:
+                if f.getAtom().getState() == False:
                     return True
         return False
 
     # When facing a disjunction, we separate the formula into two new formula
     # That we define as new goals
-    def disjunction(self, goal, side, n):
-        self.mainGoal = goal[side][n]
+    def disjunction(self, sequent, side, num_formula):
+        formula = sequent[side][num_formula]
         if side == 0:
-            newGoals = []
-            del goal[side][n]
-            for i in [self.mainGoal[0],self.mainGoal[1]]:
-                newGoal = (goal[0]+[i], goal[1])
-                newGoals.append(newGoal)
-            return newGoals
+            new_sequents = []
+            del sequent[side][num_formula]
+            for f in [formula.getLeft(),formula.getRight()]:
+                new_sequent = (sequent[0]+[f], sequent[1])
+                new_sequents.append(new_sequent)
+            return new_sequents
         elif side == 1:
             # If there is an "or" on the right side, we delete it
-            A = self.mainGoal[0]
-            B = self.mainGoal[1]
-            del goal[side][n]
-            goal[side].append(A)
-            goal[side].append(B)
-            return [goal]
+            A = formula.getLeft()
+            B = formula.getRight()
+            del sequent[side][num_formula]
+            sequent[side].append(A)
+            sequent[side].append(B)
+            return [sequent]
         raise "Disjunction: Error choosing the side (not 0 or 1)"
 
     # A conjunction would create two new goals
-    def conjunction(self, goal, side, n):
-        self.mainGoal = goal[side][n]
+    def conjunction(self, sequent, side, num_formula):
+        formula = sequent[side][num_formula]
+        A = formula.getLeft()
+        B = formula.getRight()
+        del sequent[side][num_formula]
         if side == 0:
-            A = self.mainGoal[0]
-            B = self.mainGoal[1]
-            del goal[side][n]
-            goal[side].append(A)
-            goal[side].append(B)
-            return [goal]
+            sequent[side].append(A)
+            sequent[side].append(B)
+            return [sequent]
         elif side == 1: 
-            newGoals = []
-            del goal[side][n]
-            for i in [self.mainGoal[0],self.mainGoal[1]]:
-                newGoal = (goal[0]+[i],goal[1])
-                newGoals.append(newGoal)
-            return newGoals
+            new_sequents = []
+            for i in [A,B]:
+                new_sequent = (sequent[0],sequent[1]+[i])
+                new_sequents.append(new_sequent)
+            return new_sequents
         return "Conjunction: Error choosing the side (not 0 or 1)"
 
     # If it is an implication (A -> B), we get two new goals
     # One for which A is part of the conclusion,
     # The other is when B is part of the hypothesis
-    def implication(self, goal, side, n):
-        self.mainGoal = goal[side][n]
+    def implication(self, sequent, side, num_formula):
+        formula = sequent[side][num_formula]
         if side == 0:
-            del goal[side][n]
-            newGoal_1 = (goal[0], goal[1] + [self.mainGoal[0]])
-            newGoal_2 = (goal[0] + [self.mainGoal[1]], goal[1])
-            return [newGoal_1, newGoal_2]
+            del sequent[side][num_formula]
+            new_sequent_1 = (sequent[0], sequent[1] + [formula.getLeft()])
+            new_sequent_2 = (sequent[0] + [formula.getRight()], sequent[1])
+            return [new_sequent_1, new_sequent_2]
         elif side == 1:
-            A = self.mainGoal[0]
-            B = self.mainGoal[1]
-            del goal[side][n]
-            goal[0].append(A)
-            goal[1].append(B)
-            return [goal]
+            A = formula.getLeft()
+            B = formula.getRight()
+            del sequent[side][num_formula]
+            sequent[0].append(A)
+            sequent[1].append(B)
+            return [sequent]
         return "Implication: Error choosing the side (not 0 or 1)"
 
     # Negation is equivalent to A imply Falsehood
-    def negation(self, goal, side, n):
-        self.mainGoal = goal[side][n]
-        A = self.mainGoal[0]
-        goal[side][n] = [A, [self.Falsehood], "imply"]
-        return [goal]
+    def negation(self, sequent, side, num_formula):
+        formula = sequent[side][num_formula]
+        print(formula)
+        A = formula.getLeft()
+        sequent[side][num_formula] = Formula(Conn.IMPL, [A, self.Falsehood])
+        #[A, [self.Falsehood], "imply"]
+        return [sequent]
 
     # Cut breaks the main goal into smaller goals that
     # make it easier to prove
+    # Delta and Gamma are lists of formula
+    # Make sure that Delta U Gamma = Hypothesis
     def cut(self, mainGoal, delta, gamma, prop):
         self.mainGoal = mainGoal
         C = self.mainGoal[1]
-        newGoal_1 = ([gamma],[prop])
+        newGoal_1 = (gamma,[prop])
         newGoal_2 = ([prop, delta],C)
         return [newGoal_1, newGoal_2]
 

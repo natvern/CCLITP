@@ -12,15 +12,19 @@
 #    NOTES FROM 7/4/2019 
 #    Rules have been changed to a new file specific to sequent calculus
 
+#    NOTES FROM 7/15/2019
+#    Change formula (change parse_f function)
+
 from calculus import Calculus
 from propositions import *
 from translation import translate
+from formula import *
 
 # Input the formula (Theorem to prove)
 # A formula is based on a hypothesis and a conclusion
 # We define them as an object
 
-class Formula:
+class Theorem:
     def __init__(self, goals, props):
         self.goals = [goals]
         self.proof = Calculus()
@@ -117,14 +121,14 @@ class Formula:
         else:
             side = -1
  
-        logical_connective = self.mainGoal[side][numGoal][-1]
+        logical_connective = self.mainGoal[side][numGoal].getConn()
 
         ## APPLY RULES ACCORDING TO THE LOGICAL CONNECTIVE
-        if logical_connective == "not":
+        if logical_connective == Conn.NOT:
             self.proof.negation(self.mainGoal, side, numGoal)
             return "We make the not equivalent to an implication for falsehood."
 
-        elif logical_connective == "or":
+        elif logical_connective == Conn.OR:
             newGoal = self.proof.disjunction(self.mainGoal, side, numGoal)
             del self.goals[num] 
             self.goals += newGoal

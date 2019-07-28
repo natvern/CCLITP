@@ -18,7 +18,7 @@
 #    NOTES FROM 7/22/2019 
 #    Rewrite engine file to match the new representation of formulas
 
-from calculus import calculus
+from calculus import Calculus
 from propositions import *
 from formula import *
 
@@ -31,19 +31,27 @@ class Theorem:
     def __init__(self, sequent):
         self.sequents = [sequent]
         self.proof = Calculus() 
-        self.propositions = self.getProp(sequent[0]).union(self.getProp(sequent[1]))
+        self.propositions = self.getProps(sequent[0][0]) + self.getProps(sequent[1][0])
 
-    def getProps(self, f):
-        atoms = {}
+    def getProps(self, f, atoms = []):
         if f.getConn().value == 0:
-            atoms.union(f.getAtom())
+            if f.getAtom() != []:
+                if not f.getAtom() in atoms:
+                    return atoms + [f.getAtom()]
         elif f.getConn().value == 1:
-            atoms.union(getProps(f.getLeft())) 
-        elif f.getConn().value == 2:
-            atoms.union(getProps(f.getRight()))
+            return self.getProps(f.getLeft(), atoms)
+        elif f.getConn().value >= 2:
+            return self.getProps(f.getLeft(), atoms)
+            return self.getProps(f.getRight(), atoms)
         else:
             raise "Error: invalid enumeration for connective"
         return atoms
+
+    def showStatement(self):
+        return "If " + str(self.sequents[0][0][0]) + " then " + str(self.sequents[0][1][0])
+
+    def toString(self, formula):
+        return str(formula)
 
     # There might be multiple sequents to prove, num_sequent indicates 
     # which one we selected to apply Rules on
@@ -58,6 +66,14 @@ class Theorem:
 
         sequent = self.sequents[num_sequent]
         logical_connective = sequent[side][num_formula].getConn()
+
+        # We check for an axiom
+        if self.proof.identity(sequent[0], sequent[1]):
+            del self.sequents[num_sequent]
+            return "Identity found"
+        if self.proof.found_falsehood(sequent[0]):
+            del self.sequents[num_sequent]
+            return "Falsehood found in hypothesis"
 
         # We apply the rules according to the logical connective
         if logical_connective == Conn.NOT:
@@ -83,13 +99,7 @@ class Theorem:
             return "Implication found"
 
         if logical_connective == Conn.NONE:
-            if self.proof.identity(sequent[0], sequent[1]):
-                del self.sequents[num_sequent]
-                return "Identity found"
-            if self.proof.found_falsehood(sequent[0]):
-                del self.sequents[num_sequent]
-                return "Falsehood found in hypothesis"
-            return "Nothing found"
+            return "No axiom found"
 
         raise "Error: Connective is inexistant"
 

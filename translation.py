@@ -2,9 +2,13 @@
 # Operators and clauses are expected to be separated by spaces
 # e.g. A and B not AandB, ( A or B ) not (A or B)
 
+# NOTES FROM 7/15/2019: Parse generator
+
 #form = input()
 #form_l = form.split(" ")
 #print(form_l)
+
+from formula import *
 
 # Code inspired from CLAC hw for 15-122 
 ## Make sure that the "stack" we have only has values of higher precedence 
@@ -116,10 +120,24 @@ def syntax(form):
     return output_final
 
 def parse_f(form, i = 0):
-    if len(form) < i+3:
+    # If object formula, base case is len 1
+    if len(form) == i+1:
+        if type(form[i]) == str:
+            form[i] == Formula(Conn.NONE, Prop(form[i]))
         return form
     if form[i+2] in ["imply", "and", "or"]:
-        current = [form[i], form[i+1], form[i+2]]
+        if type(form[i]) == str:
+            form[i] = Formula(Conn.NONE, Prop(form[i]))
+        if type(form[i+1]) == str:
+            form[i+1] = Formula(Conn.NONE, Prop(form[i+1]))
+        # Instead of creating list, create object
+        if form[i+2] == "imply":
+            current = Formula(Conn.IMPL, [form[i], form[i+1]])
+        elif form[i+2] == "and":
+            current = Formula(Conn.AND, [form[i], form[i+1]])
+        else:
+            current = Formula(Conn.OR, [form[i], form[i+1]])
+        #current = [form[i], form[i+1], form[i+2]]
         if i > 0:
             return parse_f(form[:i] + [current] + form[i+3:])
         else:
@@ -129,13 +147,16 @@ def parse_f(form, i = 0):
 
 def translate(form):
     form_l = form.split(" ")
-    return parse_f(syntax(form_l))[0]
+    f = parse_f(syntax(form_l))
+    #print(f.getConn())
+    return f[0]
 
 ## TESTING 
 def testing():
+    print(translate("A or B"))
     print(translate("( ( A imply B ) and B ) imply C"))
     print(translate("( ( A and B ) imply C )"))
     print(translate("A and ( B or C ) imply D"))
     print(translate("A and ( ( B or C ) imply D )"))
     print(translate("( Sideeg imply Idiot ) and ( Sideeg imply Ward )"))
-    #print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))
+    print(translate("( CMU and EC ) imply ( ( CMU imply BEST ) and ( EC imply BEST ) )"))
