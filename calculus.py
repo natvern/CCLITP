@@ -116,9 +116,9 @@ class Calculus:
         A = cut_l[2]
         C = sequent[1]
         if delta == []:
-            new_sequent_2 = ([A], C)
+            new_sequent_2 = ([gamma, A], C)
         else:
-            new_sequent_2 = ([A, delta],C)
+            new_sequent_2 = ([gamma, A, delta], C)
         new_sequent_1 = ([gamma],[A])  
         return [new_sequent_1, new_sequent_2]
 
