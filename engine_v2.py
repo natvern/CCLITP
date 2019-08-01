@@ -21,6 +21,7 @@
 from calculus import Calculus
 from propositions import *
 from formula import *
+from translation import translate
 
 # Theorem class takes as input a sequent represented as :
 # a tuple defined (formula_1, formula_2)
@@ -32,6 +33,8 @@ class Theorem:
         self.sequents = [sequent]
         self.proof = Calculus() 
         self.propositions = self.getProps(sequent[0][0]) + self.getProps(sequent[1][0])
+        self.inProgress = "Cut"
+        self.cut = []
 
     def getProps(self, f, atoms = []):
         if f.getConn().value == 0:
@@ -53,16 +56,60 @@ class Theorem:
     def toString(self, formula):
         return str(formula)
 
+    # Input  : list_Formula and Formula_1 such that Formula_1 in list_Formula
+    # Output : Formula_2 such that Formula_1 U Formula_2 = list_Formula
+    def find_delta(self, lf, f1):
+        f2 = []
+        for f in lf:
+            if f != f1:
+                f2.append(f)
+        return f2 
+
     # There might be multiple sequents to prove, num_sequent indicates 
     # which one we selected to apply Rules on
     # The side can be 0 (hypothesis) or 1 (conclusion)
     # The num_formula is to choose which sub_formula we apply the rule to
-    def applyRules(self, num_sequent, side, num_formula):
+    def applyRules(self, num_sequent, side, num_formula, A = ""):
+
+        print(self.sequents)
         
         # Base case: no sequent to prove
         if self.sequents == []:
             print("Reached an axiom.")
             return True
+
+        ##### IMPLEMENTING CUT #####
+
+        # Cut case: when selecting A
+        if self.inProgress == "give_A":
+            A = translate(A)
+            self.cut.append(A)
+            self.inProgress = "Cut"
+            new_sequent = self.proof.cut(self.sequents[num_sequent], self.cut)
+            del self.sequents[num_sequent]
+            self.sequents += new_sequent
+            return "We applied Cut"
+
+        # Cut case: when selecting Gamma
+        if self.inProgress == "Gamma":
+            if num_sequent == -1 and side == 0 and num_formula == -1:
+                gamma = Formula(Conn.NONE, [])
+            else:
+                if side != 0:
+                    raise "Error: Gamma can only be part of the hypothesis"
+                gamma = self.sequents[num_sequent][side][num_formula]
+            self.cut.append(gamma)
+            delta = self.find_delta(self.sequents[num_sequent][0], gamma)
+            self.cut.append(delta)
+            self.inProgress = "A"
+            return "Select A, click on A and type the formula you want to add"
+            
+        # Cut case: when applying cut, num_sequent, side and num_formula = -1
+        if num_sequent == -1 and side == 0 and num_formula == -1:
+            if self.inProgress == "Cut":
+                self.inProgress = "Gamma"
+                return "Select Gamma, click on Gamma if you want Gamma to be empty"
+
 
         sequent = self.sequents[num_sequent]
         logical_connective = sequent[side][num_formula].getConn()

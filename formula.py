@@ -63,6 +63,9 @@ class Formula:
     def __str__(self):
         return self.print_formula(self)
 
+    def __repr__(self):
+        return str(self)
+
     def print_formula(self, f):
         if f.getConn().value == 0:
             return str(f.getAtom())

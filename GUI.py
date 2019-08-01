@@ -94,21 +94,24 @@ class Proof:
         self.frames = []
         self.displayFormula()
         self.frame.pack()
+        # Added to apply cut
+        self.give_A = tkinter.Entry(self.frames[-1])
 
     def buttonClicked(self, goal, statement, clause):
-        maybe_cut = input()
-        if maybe_cut == "cut":
-            self.formula.inProgress.append([goal, statement, clause])
+
+        if self.formula.inProgress == "A":
+            self.give_A = tkinter.Entry(self.frames[-1])
+            self.formula.inProgress = "give_A"
+            self.give_A.pack()
             return 0
-        if maybe_cut == "prop":
-            self.formula.inProgress.append(input())
-            return 0
-        if maybe_cut == "do":
-            message = self.formula.getCut(goal)
-            messagebox.showinfo("Rule applied", message)
-            self.displayFormula()
-            return 0
-        message = self.formula.applyRules(goal, statement, clause)
+
+        if self.formula.inProgress == "give_A":
+            print(self.give_A.get())
+            message = self.formula.applyRules(goal, statement, clause, self.give_A.get())
+            self.formula.inProgress = "Cut"
+        else:
+            message = self.formula.applyRules(goal, statement, clause)
+
         messagebox.showinfo("Rule applied",message)
         if message == "You just clicked on something that did not do much. Try playing with another button.":
             return 0
@@ -137,5 +140,7 @@ class Proof:
                 if statement == 0:
                     separation = tkinter.Label(self.frames[j-1],bg="#062356", fg="#FFFFFF", text = "|--")
                     separation.pack(side="left")
+        # Add button to apply cut at any point in the proof
+        self.options.append(tkinter.Button(self.frames[j-1], text=self.formula.inProgress, highlightbackground="#062356", command=lambda x=-1, y=0, z=-1: self.buttonClicked(x, y, z)))
+        self.options[-1].pack(side="right")
         self.frames[j-1].pack(side="top")
-

@@ -34,6 +34,8 @@
 #    24/07/2019 13:30
 #    25/07/2019 17:50
 #    28/07/2019 16:18
+#    30/07/2019 20:09
+#    01/08/2019 15:00
 
 from engine_v2 import *
 from GUI import *
@@ -58,7 +60,7 @@ Idiot = Prop("Idiot")
 Idiot_1 = Prop("Idiot")
 
 
-hypothesis = translate("Red and Green")
+hypothesis = translate("Fayad or Red")
 conclusion = translate("Red and Ward")
 firstFormula = ([hypothesis], [conclusion])
 statement = Theorem(firstFormula)

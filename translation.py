@@ -146,9 +146,12 @@ def parse_f(form, i = 0):
         return parse_f(form, i+1)
 
 def translate(form):
+    if form == "":
+        return Formula(Conn.NONE, [])
     form_l = form.split(" ")
+    if len(form_l) == 1:
+        return Formula(Conn.NONE, Prop(form_l[0]))
     f = parse_f(syntax(form_l))
-    #print(f.getConn())
     return f[0]
 
 ## TESTING 
