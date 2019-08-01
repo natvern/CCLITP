@@ -96,8 +96,12 @@ class Proof:
         self.frame.pack()
         # Added to apply cut
         self.give_A = tkinter.Entry(self.frames[-1])
+        self.contraction = False
 
     def buttonClicked(self, goal, statement, clause):
+        if goal == -2 and statement == -2 and clause == -2:
+            self.contraction = True
+            return 0
 
         if self.formula.inProgress == "A":
             self.give_A = tkinter.Entry(self.frames[-1])
@@ -109,6 +113,9 @@ class Proof:
             print(self.give_A.get())
             message = self.formula.applyRules(goal, statement, clause, self.give_A.get())
             self.formula.inProgress = "Cut"
+        elif self.contraction:
+            message = self.formula.applyRules(goal, statement, clause, "Contraction")
+            self.contraction = False
         else:
             message = self.formula.applyRules(goal, statement, clause)
 
@@ -142,5 +149,6 @@ class Proof:
                     separation.pack(side="left")
         # Add button to apply cut at any point in the proof
         self.options.append(tkinter.Button(self.frames[j-1], text=self.formula.inProgress, highlightbackground="#062356", command=lambda x=-1, y=0, z=-1: self.buttonClicked(x, y, z)))
+        self.options.append(tkinter.Button(self.frames[j-1], text="Contraction", highlightbackground="#062356", command=lambda x=-2, y=-2, z=-2: self.buttonClicked(x, y, z)))
         self.options[-1].pack(side="right")
         self.frames[j-1].pack(side="top")

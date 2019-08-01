@@ -71,8 +71,6 @@ class Theorem:
     # The num_formula is to choose which sub_formula we apply the rule to
     def applyRules(self, num_sequent, side, num_formula, A = ""):
 
-        print(self.sequents)
-        
         # Base case: no sequent to prove
         if self.sequents == []:
             print("Reached an axiom.")
@@ -113,6 +111,13 @@ class Theorem:
 
         sequent = self.sequents[num_sequent]
         logical_connective = sequent[side][num_formula].getConn()
+
+        ##### IMPLEMENTING CONTRACTION #####
+        if A == "Contraction":
+            new_sequent = self.proof.contraction(sequent, side, num_formula)
+            del self.sequents[num_sequent]
+            self.sequents += new_sequent
+            return "Applied contraction"
 
         # We check for an axiom
         if self.proof.identity(sequent[0], sequent[1]):

@@ -122,3 +122,14 @@ class Calculus:
         new_sequent_1 = ([gamma],[A])  
         return [new_sequent_1, new_sequent_2]
 
+    # Applies contraction to given sequent on the given formula
+    def contraction(self, sequent, side, num_formula):
+        formula = sequent[side][num_formula]
+        if side == 0:
+            new_sequent = (sequent[0]+[formula], sequent[1])
+        elif side == 1:
+            new_sequent = (sequent[0], [formula]+sequent[1])
+        else:
+            raise "Error: side is non existing in contraction"
+        return [new_sequent]
+
