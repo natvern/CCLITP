@@ -36,12 +36,13 @@
 #    28/07/2019 16:18
 #    30/07/2019 20:09
 #    01/08/2019 15:00
+#    03/08/2019 19:28
 
 from engine_v2 import *
 from GUI import *
 from translation import translate
 import tkinter
-from calculus import Calculus
+from constructive_calculus import Calculus
 from formula import *
 
 # Main function to run CCLITP
@@ -58,11 +59,15 @@ Sideeg = Prop("Sideeg")
 Ward = Prop("Ward")
 Idiot = Prop("Idiot")
 Idiot_1 = Prop("Idiot")
+A = Formula(Conn.NONE, Prop("A"))
 
+#hypothesis = translate("A or Red")
+#conclusion = translate("Red and Ward")
 
-hypothesis = translate("Fayad or Red")
-conclusion = translate("Red and Ward")
-firstFormula = ([hypothesis], [conclusion])
+notA= Formula(Conn.NOT, [A])
+AnotA = Formula(Conn.OR, [A, notA])
+#AnotA = Formula(Conn.NOT, [Formula(Conn.NOT, [AnotA])])
+firstFormula = ([Formula(Conn.NONE, [])], [AnotA])
 statement = Theorem(firstFormula)
 
 # Running CCLITP

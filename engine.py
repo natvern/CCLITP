@@ -15,7 +15,7 @@
 #    NOTES FROM 7/15/2019
 #    Change formula (change parse_f function)
 
-from calculus import Calculus
+from constructive_calculus import Calculus
 from propositions import *
 from translation import translate
 from formula import *
