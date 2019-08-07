@@ -40,9 +40,10 @@
 
 from engine_v2 import *
 from GUI import *
+import global_logic
 from translation import translate
 import tkinter
-from constructive_calculus import Calculus
+#from logic import Calculus
 from formula import *
 
 # Main function to run CCLITP

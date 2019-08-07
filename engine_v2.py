@@ -18,7 +18,7 @@
 #    NOTES FROM 7/22/2019 
 #    Rewrite engine file to match the new representation of formulas
 
-from constructive_calculus import Calculus
+from global_logic import *
 from propositions import *
 from formula import *
 from translation import translate
